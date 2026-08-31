@@ -379,12 +379,12 @@ Visuals:CreateSlider({
 })
 
 --======================================================
--- GUN
+-- ITEMS
 --======================================================
 
-Gun:CreateSection("Laser Gun")
+Items:CreateSection("Items")
 
-Gun:CreateButton({
+Items:CreateButton({
     Name = "Give Laser Gun",
 
     Callback = function()
