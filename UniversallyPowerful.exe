@@ -1,49 +1,90 @@
--- For your own Roblox experience btw
+--// IKONNED UI
+--// Rayfield / Sirius documentation-based version
+--// Intended for your own Roblox experience
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TeleportService = game:GetService("TeleportService")
 
 local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
+
+--//====================================================
+--// WINDOW
+--//====================================================
 
 local Window = Rayfield:CreateWindow({
     Name = "Ikonned UI",
-    LoadingTitle = "By @Ikonned",
-    LoadingSubtitle = "Universal",
+    Icon = "sparkles",
+    LoadingTitle = "Ikonned UI",
+    LoadingSubtitle = "By @Ikonned",
+    ShowText = "Ikonned",
+    Theme = "Default",
+    ToggleUIKeybind = "K",
+
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+
     ConfigurationSaving = {
         Enabled = true,
         FolderName = "IkonnedUI",
         FileName = "Settings"
     },
+
+    Discord = {
+        Enabled = false,
+        Invite = "noinvitelink",
+        RememberJoins = true
+    },
+
     KeySystem = false
 })
 
+--//====================================================
+--// HELPERS
+--//====================================================
+
+local function GetCharacter()
+    return LocalPlayer.Character
+end
+
+local function GetHumanoid()
+    local Character = GetCharacter()
+
+    if not Character then
+        return nil
+    end
+
+    return Character:FindFirstChildOfClass("Humanoid")
+end
+
+local function GetRootPart()
+    local Character = GetCharacter()
+
+    if not Character then
+        return nil
+    end
+
+    return Character:FindFirstChild("HumanoidRootPart")
+end
+
+--//====================================================
 --// HOME
-
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-
-local Player = Players.LocalPlayer
+--//====================================================
 
 local Home = Window:CreateTab("Home", "house")
 
 Home:CreateSection("Movement")
 
-local infiniteJump = false
-local noclip = false
-local float = false
-local walkSpeed = 16
+local InfiniteJumpEnabled = false
+local NoclipEnabled = false
+local FloatEnabled = false
+local WalkSpeed = 16
 
-local function getCharacter()
-    return Player.Character
-end
+--// Walk Speed
 
-local function getHumanoid()
-    local Character = getCharacter()
-    return Character and Character:FindFirstChildOfClass("Humanoid")
-end
-
---// Speed Slider
 Home:CreateSlider({
     Name = "Walk Speed",
     Range = {16, 100},
@@ -53,9 +94,10 @@ Home:CreateSlider({
     Flag = "WalkSpeed",
 
     Callback = function(Value)
-        walkSpeed = Value
+        WalkSpeed = Value
 
-        local Humanoid = getHumanoid()
+        local Humanoid = GetHumanoid()
+
         if Humanoid then
             Humanoid.WalkSpeed = Value
         end
@@ -63,22 +105,23 @@ Home:CreateSlider({
 })
 
 --// Infinite Jump
+
 Home:CreateToggle({
     Name = "Infinite Jump",
     CurrentValue = false,
     Flag = "InfiniteJump",
 
     Callback = function(Value)
-        infiniteJump = Value
+        InfiniteJumpEnabled = Value
     end
 })
 
 UserInputService.JumpRequest:Connect(function()
-    if not infiniteJump then
+    if not InfiniteJumpEnabled then
         return
     end
 
-    local Humanoid = getHumanoid()
+    local Humanoid = GetHumanoid()
 
     if Humanoid then
         Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
@@ -86,67 +129,103 @@ UserInputService.JumpRequest:Connect(function()
 end)
 
 --// Noclip
+
 Home:CreateToggle({
     Name = "Noclip",
     CurrentValue = false,
     Flag = "Noclip",
 
     Callback = function(Value)
-        noclip = Value
+        NoclipEnabled = Value
+
+        -- Restore collisions when disabled
+        if not Value then
+            local Character = GetCharacter()
+
+            if Character then
+                for _, Object in ipairs(Character:GetDescendants()) do
+                    if Object:IsA("BasePart") then
+                        if Object.Name ~= "HumanoidRootPart" then
+                            Object.CanCollide = true
+                        end
+                    end
+                end
+            end
+        end
     end
 })
 
 RunService.Stepped:Connect(function()
-    if not noclip then
+    if not NoclipEnabled then
         return
     end
 
-    local Character = getCharacter()
+    local Character = GetCharacter()
 
-    if Character then
-        for _, Part in ipairs(Character:GetDescendants()) do
-            if Part:IsA("BasePart") then
-                Part.CanCollide = false
-            end
+    if not Character then
+        return
+    end
+
+    for _, Object in ipairs(Character:GetDescendants()) do
+        if Object:IsA("BasePart") then
+            Object.CanCollide = false
         end
     end
 end)
 
 --// Float
+
 Home:CreateToggle({
     Name = "Float",
     CurrentValue = false,
     Flag = "Float",
 
     Callback = function(Value)
-        float = Value
+        FloatEnabled = Value
     end
 })
 
 RunService.Heartbeat:Connect(function()
-    local Character = getCharacter()
-    local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
-
-    if not HumanoidRootPart then
+    if not FloatEnabled then
         return
     end
 
-    if float then
-        HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(
-            HumanoidRootPart.AssemblyLinearVelocity.X,
-            0,
-            HumanoidRootPart.AssemblyLinearVelocity.Z
-        )
+    local RootPart = GetRootPart()
+
+    if not RootPart then
+        return
+    end
+
+    local Velocity = RootPart.AssemblyLinearVelocity
+
+    RootPart.AssemblyLinearVelocity = Vector3.new(
+        Velocity.X,
+        0,
+        Velocity.Z
+    )
+end)
+
+--// Respawn handling
+
+LocalPlayer.CharacterAdded:Connect(function(Character)
+    local Humanoid = Character:WaitForChild("Humanoid")
+
+    task.wait()
+
+    Humanoid.WalkSpeed = WalkSpeed
+
+    if NoclipEnabled then
+        for _, Object in ipairs(Character:GetDescendants()) do
+            if Object:IsA("BasePart") then
+                Object.CanCollide = false
+            end
+        end
     end
 end)
 
---// Reapply speed after respawn
-Player.CharacterAdded:Connect(function(Character)
-    local Humanoid = Character:WaitForChild("Humanoid")
-    Humanoid.WalkSpeed = walkSpeed
-end)
-
+--//====================================================
 --// VISUALS
+--//====================================================
 
 local Visuals = Window:CreateTab("Visuals", "eye")
 
@@ -156,19 +235,30 @@ local ESPEnabled = false
 local ESPObjects = {}
 
 local function RemoveESP(Player)
-    if ESPObjects[Player] then
-        ESPObjects[Player]:Destroy()
+    local Object = ESPObjects[Player]
+
+    if Object then
+        Object:Destroy()
         ESPObjects[Player] = nil
     end
 end
 
 local function AddESP(Player)
-    if Player == LocalPlayer or not ESPEnabled then
+    if Player == LocalPlayer then
+        return
+    end
+
+    if not ESPEnabled then
         return
     end
 
     local Character = Player.Character
-    local RootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+
+    if not Character then
+        return
+    end
+
+    local RootPart = Character:FindFirstChild("HumanoidRootPart")
 
     if not RootPart then
         return
@@ -177,6 +267,7 @@ local function AddESP(Player)
     RemoveESP(Player)
 
     local Box = Instance.new("BoxHandleAdornment")
+
     Box.Name = "IkonnedESP"
     Box.Adornee = RootPart
     Box.Size = Vector3.new(4, 6, 2)
@@ -189,6 +280,14 @@ local function AddESP(Player)
     ESPObjects[Player] = Box
 end
 
+local function UpdateAllESP()
+    for _, Player in ipairs(Players:GetPlayers()) do
+        if Player ~= LocalPlayer then
+            AddESP(Player)
+        end
+    end
+end
+
 Visuals:CreateToggle({
     Name = "Player ESP",
     CurrentValue = false,
@@ -198,9 +297,7 @@ Visuals:CreateToggle({
         ESPEnabled = Value
 
         if Value then
-            for _, Player in ipairs(Players:GetPlayers()) do
-                AddESP(Player)
-            end
+            UpdateAllESP()
         else
             for Player in pairs(ESPObjects) do
                 RemoveESP(Player)
@@ -209,25 +306,54 @@ Visuals:CreateToggle({
     end
 })
 
-Players.PlayerAdded:Connect(function(Player)
-    Player.CharacterAdded:Connect(function()
-        task.wait(0.5)
-        AddESP(Player)
-    end)
-end)
+--// Existing players
 
 for _, Player in ipairs(Players:GetPlayers()) do
     if Player ~= LocalPlayer then
-        Player.CharacterAdded:Connect(function()
-            task.wait(0.5)
-            AddESP(Player)
+
+        Player.CharacterAdded:Connect(function(Character)
+            local RootPart = Character:WaitForChild(
+                "HumanoidRootPart",
+                5
+            )
+
+            if RootPart then
+                task.wait(0.1)
+                AddESP(Player)
+            end
         end)
+
+        if Player.Character then
+            task.defer(function()
+                AddESP(Player)
+            end)
+        end
     end
 end
+
+--// New players
+
+Players.PlayerAdded:Connect(function(Player)
+
+    Player.CharacterAdded:Connect(function(Character)
+
+        local RootPart = Character:WaitForChild(
+            "HumanoidRootPart",
+            5
+        )
+
+        if RootPart then
+            task.wait(0.1)
+            AddESP(Player)
+        end
+    end)
+end)
 
 Players.PlayerRemoving:Connect(function(Player)
     RemoveESP(Player)
 end)
+
+--// Camera
 
 Visuals:CreateSection("Camera")
 
@@ -238,12 +364,19 @@ Visuals:CreateSlider({
     Suffix = "°",
     CurrentValue = 90,
     Flag = "FOV",
+
     Callback = function(Value)
-        Camera.FieldOfView = Value
+        local Camera = workspace.CurrentCamera
+
+        if Camera then
+            Camera.FieldOfView = Value
+        end
     end
 })
 
+--//====================================================
 --// GUN
+--//====================================================
 
 local Gun = Window:CreateTab("Gun", "crosshair")
 
@@ -251,13 +384,46 @@ Gun:CreateSection("Laser Gun")
 
 Gun:CreateButton({
     Name = "Give Laser Gun",
+
     Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ikonned/LaserGun/refs/heads/main/ClientSided"))()
-        print("Hi, this is just a ClientSided Test Laser Gun")
+
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://raw.githubusercontent.com/ikonned/LaserGun/refs/heads/main/ClientSided"
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Laser Gun source could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Laser Gun",
+                Content = "Laser Gun loaded successfully.",
+                Duration = 5,
+                Image = "crosshair"
+            })
+        else
+            warn("Laser Gun error:", Result)
+
+            Rayfield:Notify({
+                Title = "Laser Gun Error",
+                Content = "The Laser Gun could not be loaded.",
+                Duration = 5,
+                Image = "triangle-alert"
+            })
+        end
     end
 })
 
+--//====================================================
 --// DEVELOPER TOOLS
+--//====================================================
 
 local Tools = Window:CreateTab("Tools", "wrench")
 
@@ -265,36 +431,134 @@ Tools:CreateSection("Developer Tools")
 
 Tools:CreateButton({
     Name = "Infinite Yeild",
+
     Callback = function()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Infinite Yield source could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if not Success then
+            warn("Infinite Yield error:", Result)
+
+            Rayfield:Notify({
+                Title = "Infinite Yield",
+                Content = "Failed to load Infinite Yield.",
+                Duration = 5,
+                Image = "triangle-alert"
+            })
+        end
     end
 })
 
 Tools:CreateButton({
     Name = "Dex Explorer ++",
+
     Callback = function()
-         loadstring(game:HttpGet("https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"))() 
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Dex Explorer ++ source could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if not Success then
+            warn("Dex Explorer ++ error:", Result)
+
+            Rayfield:Notify({
+                Title = "Dex Explorer ++",
+                Content = "Failed to load Dex Explorer ++.",
+                Duration = 5,
+                Image = "triangle-alert"
+            })
+        end
     end
 })
 
 Tools:CreateButton({
     Name = "Remote Spy",
+
     Callback = function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Klinac/scripts/main/utopia_spy.lua", true))()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://raw.githubusercontent.com/Klinac/scripts/main/utopia_spy.lua",
+                true
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Remote Spy source could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if not Success then
+            warn("Remote Spy error:", Result)
+
+            Rayfield:Notify({
+                Title = "Remote Spy",
+                Content = "Failed to load Remote Spy.",
+                Duration = 5,
+                Image = "triangle-alert"
+            })
+        end
     end
 })
 
 Tools:CreateButton({
     Name = "Simple Spy",
+
     Callback = function()
-loadstring(game:HttpGet("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"))()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Simple Spy source could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if not Success then
+            warn("Simple Spy error:", Result)
+
+            Rayfield:Notify({
+                Title = "Simple Spy",
+                Content = "Failed to load Simple Spy.",
+                Duration = 5,
+                Image = "triangle-alert"
+            })
+        end
     end
 })
 
 Tools:CreateButton({
     Name = "Reset Character",
+
     Callback = function()
-        local Character = LocalPlayer.Character
+        local Character = GetCharacter()
         local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
 
         if Humanoid then
@@ -305,8 +569,9 @@ Tools:CreateButton({
 
 Tools:CreateButton({
     Name = "Rejoin Server",
+
     Callback = function()
-        game:GetService("TeleportService"):Teleport(
+        TeleportService:Teleport(
             game.PlaceId,
             LocalPlayer
         )
@@ -325,8 +590,15 @@ Tools:CreateToggle({
     end
 })
 
+--//====================================================
+--// LOAD
+--//====================================================
+
+Rayfield:LoadConfiguration()
+
 Rayfield:Notify({
-    Title = "Ikonned Universal UI",
+    Title = "Ikonned UI",
     Content = "Loaded successfully.",
-    Duration = 5
+    Duration = 5,
+    Image = "sparkles"
 })
