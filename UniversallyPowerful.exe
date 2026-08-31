@@ -383,6 +383,80 @@ Visuals:CreateSlider({
 -- EXPLOITS
 --======================================================
 
+Exploits:CreateSection("Fun Scripts")
+
+Exploits:CreateButton({
+    Name = "Neko V4",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://raw.githubusercontent.com/shidemuri/coffeeware/main/nekov4.lua"
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Neko V4 could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Neko V4",
+                Content = "Loaded successfully.",
+                Duration = 5
+            })
+        else
+            warn("Neko V4 Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Neko V4 Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+})
+
+Exploits:CreateButton({
+    Name = "Neko V5",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://raw.githubusercontent.com/shidemuri/coffeeware/main/nekov5.lua"
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Neko V5 could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Neko V5",
+                Content = "Loaded successfully.",
+                Duration = 5
+            })
+        else
+            warn("Neko V5 Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Neko V5 Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+})
+
 Exploits:CreateButton({
     Name = "Rainbow Trail [ FE ]",
 
