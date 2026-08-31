@@ -388,9 +388,7 @@ Items:CreateButton({
     Name = "Give Laser Gun",
 
     Callback = function()
-
         local Success, Result = pcall(function()
-
             local Source = game:HttpGet(
                 "https://raw.githubusercontent.com/ikonned/LaserGun/refs/heads/main/ClientSided"
             )
@@ -426,9 +424,7 @@ Items:CreateButton({
     Name = "Rainbow Swords",
 
     Callback = function()
-
         local Success, Result = pcall(function()
-
             local Source = game:HttpGet(
                 "https://raw.githubusercontent.com/gObl00x/Pendulum-Fixed-AND-Others-Scripts/refs/heads/main/Dual%20Ultima%20RB%20Swords"
             )
