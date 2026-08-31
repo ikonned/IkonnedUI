@@ -563,7 +563,7 @@ Exploits:CreateToggle({
 Items:CreateSection("Items")
 
 Items:CreateButton({
-    Name = "Give Laser Gun",
+    Name = "Laser Gun",
 
     Callback = function()
         local Success, Result = pcall(function()
@@ -627,6 +627,42 @@ Items:CreateButton({
 
             Rayfield:Notify({
                 Title = "Classical AK 47 Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+})
+
+Items:CreateButton({
+    Name = "Lightning Cannon",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://raw.githubusercontent.com/bayly098764321/Exire-Reanimate/refs/heads/main/Scripts/LightningCannon.lua"
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Lightning Cannon script could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Lightning Cannon",
+                Content = "Lightning Cannon loaded successfully.",
+                Duration = 5
+            })
+        else
+            warn("Lightning Cannon Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Lightning Cannon Error",
                 Content = tostring(Result),
                 Duration = 5
             })
