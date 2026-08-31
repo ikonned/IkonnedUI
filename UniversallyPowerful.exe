@@ -60,7 +60,7 @@ local Window = Rayfield:CreateWindow({
 
 local Home = Window:CreateTab("Home", 0)
 local Visuals = Window:CreateTab("Visuals", 0)
-local Gun = Window:CreateTab("Gun", 0)
+local Items = Window:CreateTab("Items", 0)
 local Tools = Window:CreateTab("Tools", 0)
 
 --======================================================
