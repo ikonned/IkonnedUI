@@ -635,6 +635,78 @@ Items:CreateButton({
 })
 
 Items:CreateButton({
+    Name = "Rainbow MM2 Knife",
+
+    Callback = function()
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+
+        local Player = Players.LocalPlayer
+        local Backpack = Player:WaitForChild("Backpack")
+
+        local Success, Result = pcall(function()
+            local Objects = game:GetObjects("rbxassetid://121946387")
+
+            if not Objects or not Objects[1] then
+                error("Bombo's Survival Knife could not be loaded.")
+            end
+
+            local Knife = Objects[1]
+            Knife.Parent = Backpack
+
+            -- Stop an old rainbow loop
+            if _G.BombosRainbowConnection then
+                _G.BombosRainbowConnection:Disconnect()
+                _G.BombosRainbowConnection = nil
+            end
+
+            local Hue = 0
+
+            _G.BombosRainbowConnection = RunService.RenderStepped:Connect(function(DeltaTime)
+                if not Knife or not Knife.Parent then
+                    _G.BombosRainbowConnection:Disconnect()
+                    _G.BombosRainbowConnection = nil
+                    return
+                end
+
+                -- Slow + smooth rainbow
+                Hue = (Hue + DeltaTime * 0.035) % 1
+
+                local Rainbow = Color3.fromHSV(Hue, 1, 1)
+
+                for _, Object in ipairs(Knife:GetDescendants()) do
+                    if Object:IsA("BasePart") then
+                        Object.Color = Rainbow
+
+                    elseif Object:IsA("Trail") then
+                        Object.Color = ColorSequence.new(Rainbow)
+
+                    elseif Object:IsA("ParticleEmitter") then
+                        Object.Color = ColorSequence.new(Rainbow)
+                    end
+                end
+            end)
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "MM2 Knife",
+                Content = "Rainbow knife loaded successfully.",
+                Duration = 5
+            })
+        else
+            warn("MM2 Knife Error:", Result)
+
+            Rayfield:Notify({
+                Title = "MM2 Knife Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+})
+
+Items:CreateButton({
     Name = "Spec Zeta Biograft Energy Sword",
 
     Callback = function()
