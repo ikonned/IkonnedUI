@@ -541,7 +541,7 @@ Items:CreateButton({
     Callback = function()
         local Success, Result = pcall(function()
             local Source = game:HttpGet(
-                "https://raw.githubusercontent.com/sinret/rbxscript.com-scripts-reuploads-/main/ak47"
+                "https://raw.githubusercontent.com/ikonned/AK47/refs/heads/main/Classical.skid"
             )
 
             local Script = loadstring(Source)
