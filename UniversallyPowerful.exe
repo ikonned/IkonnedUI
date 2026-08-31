@@ -1,13 +1,23 @@
+--//====================================================
 --// IKONNED UI
---// Rayfield / Sirius documentation-based version test aah version
+--// Rayfield / Sirius
+--//====================================================
 
+--// Load Rayfield
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
+if not Rayfield then
+    error("Failed to load Rayfield.")
+end
+
+--// Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local TeleportService = game:GetService("TeleportService")
+local StarterGui = game:GetService("StarterGui")
 
+--// Player
 local LocalPlayer = Players.LocalPlayer
 
 --//====================================================
@@ -17,10 +27,13 @@ local LocalPlayer = Players.LocalPlayer
 local Window = Rayfield:CreateWindow({
     Name = "Ikonned UI",
     Icon = 0,
+
     LoadingTitle = "Ikonned UI",
     LoadingSubtitle = "By @Ikonned",
+
     ShowText = "Ikonned",
     Theme = "Default",
+
     ToggleUIKeybind = "K",
 
     DisableRayfieldPrompts = false,
@@ -41,9 +54,18 @@ local Window = Rayfield:CreateWindow({
     KeySystem = false
 })
 
---//====================================================
---// HELPERS
---//====================================================
+--======================================================
+-- CREATE ALL TABS TOGETHER
+--======================================================
+
+local Home = Window:CreateTab("Home", 0)
+local Visuals = Window:CreateTab("Visuals", 0)
+local Gun = Window:CreateTab("Gun", 0)
+local Tools = Window:CreateTab("Tools", 0)
+
+--======================================================
+-- HELPERS
+--======================================================
 
 local function GetCharacter()
     return LocalPlayer.Character
@@ -69,11 +91,9 @@ local function GetRootPart()
     return Character:FindFirstChild("HumanoidRootPart")
 end
 
---//====================================================
---// HOME
---//====================================================
-
-local Home = Window:CreateTab("Home", "house")
+--======================================================
+-- HOME
+--======================================================
 
 Home:CreateSection("Movement")
 
@@ -82,8 +102,7 @@ local NoclipEnabled = false
 local FloatEnabled = false
 local WalkSpeed = 16
 
---// Walk Speed
-
+-- Walk Speed
 Home:CreateSlider({
     Name = "Walk Speed",
     Range = {16, 100},
@@ -103,8 +122,7 @@ Home:CreateSlider({
     end
 })
 
---// Infinite Jump
-
+-- Infinite Jump
 Home:CreateToggle({
     Name = "Infinite Jump",
     CurrentValue = false,
@@ -127,8 +145,7 @@ UserInputService.JumpRequest:Connect(function()
     end
 end)
 
---// Noclip
-
+-- Noclip
 Home:CreateToggle({
     Name = "Noclip",
     CurrentValue = false,
@@ -137,16 +154,13 @@ Home:CreateToggle({
     Callback = function(Value)
         NoclipEnabled = Value
 
-        -- Restore collisions when disabled
         if not Value then
             local Character = GetCharacter()
 
             if Character then
                 for _, Object in ipairs(Character:GetDescendants()) do
                     if Object:IsA("BasePart") then
-                        if Object.Name ~= "HumanoidRootPart" then
-                            Object.CanCollide = true
-                        end
+                        Object.CanCollide = true
                     end
                 end
             end
@@ -172,8 +186,7 @@ RunService.Stepped:Connect(function()
     end
 end)
 
---// Float
-
+-- Float
 Home:CreateToggle({
     Name = "Float",
     CurrentValue = false,
@@ -204,12 +217,9 @@ RunService.Heartbeat:Connect(function()
     )
 end)
 
---// Respawn handling
-
+-- Respawn handling
 LocalPlayer.CharacterAdded:Connect(function(Character)
     local Humanoid = Character:WaitForChild("Humanoid")
-
-    task.wait()
 
     Humanoid.WalkSpeed = WalkSpeed
 
@@ -222,11 +232,9 @@ LocalPlayer.CharacterAdded:Connect(function(Character)
     end
 end)
 
---//====================================================
---// VISUALS
---//====================================================
-
-local Visuals = Window:CreateTab("Visuals", "eye")
+--======================================================
+-- VISUALS
+--======================================================
 
 Visuals:CreateSection("Player ESP")
 
@@ -305,15 +313,14 @@ Visuals:CreateToggle({
     end
 })
 
---// Existing players
-
+-- Existing players
 for _, Player in ipairs(Players:GetPlayers()) do
     if Player ~= LocalPlayer then
 
         Player.CharacterAdded:Connect(function(Character)
             local RootPart = Character:WaitForChild(
                 "HumanoidRootPart",
-                5
+                10
             )
 
             if RootPart then
@@ -330,15 +337,13 @@ for _, Player in ipairs(Players:GetPlayers()) do
     end
 end
 
---// New players
-
+-- New players
 Players.PlayerAdded:Connect(function(Player)
 
     Player.CharacterAdded:Connect(function(Character)
-
         local RootPart = Character:WaitForChild(
             "HumanoidRootPart",
-            5
+            10
         )
 
         if RootPart then
@@ -346,14 +351,14 @@ Players.PlayerAdded:Connect(function(Player)
             AddESP(Player)
         end
     end)
+
 end)
 
 Players.PlayerRemoving:Connect(function(Player)
     RemoveESP(Player)
 end)
 
---// Camera
-
+-- Camera
 Visuals:CreateSection("Camera")
 
 Visuals:CreateSlider({
@@ -373,11 +378,9 @@ Visuals:CreateSlider({
     end
 })
 
---//====================================================
---// GUN
---//====================================================
-
-local Gun = Window:CreateTab("Gun", "crosshair")
+--======================================================
+-- GUN
+--======================================================
 
 Gun:CreateSection("Laser Gun")
 
@@ -387,6 +390,7 @@ Gun:CreateButton({
     Callback = function()
 
         local Success, Result = pcall(function()
+
             local Source = game:HttpGet(
                 "https://raw.githubusercontent.com/ikonned/LaserGun/refs/heads/main/ClientSided"
             )
@@ -394,7 +398,7 @@ Gun:CreateButton({
             local Script = loadstring(Source)
 
             if not Script then
-                error("Laser Gun source could not be compiled.")
+                error("Could not compile Laser Gun.")
             end
 
             Script()
@@ -404,161 +408,35 @@ Gun:CreateButton({
             Rayfield:Notify({
                 Title = "Laser Gun",
                 Content = "Laser Gun loaded successfully.",
-                Duration = 5,
-                Image = "crosshair"
+                Duration = 5
             })
         else
-            warn("Laser Gun error:", Result)
+            warn("Laser Gun Error:", Result)
 
             Rayfield:Notify({
                 Title = "Laser Gun Error",
-                Content = "The Laser Gun could not be loaded.",
-                Duration = 5,
-                Image = "triangle-alert"
+                Content = tostring(Result),
+                Duration = 5
             })
         end
     end
 })
 
---//====================================================
---// DEVELOPER TOOLS
---//====================================================
-
-local Tools = Window:CreateTab("Tools", "wrench")
+--======================================================
+-- TOOLS
+--======================================================
 
 Tools:CreateSection("Developer Tools")
-
-Tools:CreateButton({
-    Name = "Infinite Yeild",
-
-    Callback = function()
-        local Success, Result = pcall(function()
-            local Source = game:HttpGet(
-                "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"
-            )
-
-            local Script = loadstring(Source)
-
-            if not Script then
-                error("Infinite Yield source could not be compiled.")
-            end
-
-            Script()
-        end)
-
-        if not Success then
-            warn("Infinite Yield error:", Result)
-
-            Rayfield:Notify({
-                Title = "Infinite Yield",
-                Content = "Failed to load Infinite Yield.",
-                Duration = 5,
-                Image = "triangle-alert"
-            })
-        end
-    end
-})
-
-Tools:CreateButton({
-    Name = "Dex Explorer ++",
-
-    Callback = function()
-        local Success, Result = pcall(function()
-            local Source = game:HttpGet(
-                "https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"
-            )
-
-            local Script = loadstring(Source)
-
-            if not Script then
-                error("Dex Explorer ++ source could not be compiled.")
-            end
-
-            Script()
-        end)
-
-        if not Success then
-            warn("Dex Explorer ++ error:", Result)
-
-            Rayfield:Notify({
-                Title = "Dex Explorer ++",
-                Content = "Failed to load Dex Explorer ++.",
-                Duration = 5,
-                Image = "triangle-alert"
-            })
-        end
-    end
-})
-
-Tools:CreateButton({
-    Name = "Remote Spy",
-
-    Callback = function()
-        local Success, Result = pcall(function()
-            local Source = game:HttpGet(
-                "https://raw.githubusercontent.com/Klinac/scripts/main/utopia_spy.lua",
-                true
-            )
-
-            local Script = loadstring(Source)
-
-            if not Script then
-                error("Remote Spy source could not be compiled.")
-            end
-
-            Script()
-        end)
-
-        if not Success then
-            warn("Remote Spy error:", Result)
-
-            Rayfield:Notify({
-                Title = "Remote Spy",
-                Content = "Failed to load Remote Spy.",
-                Duration = 5,
-                Image = "triangle-alert"
-            })
-        end
-    end
-})
-
-Tools:CreateButton({
-    Name = "Simple Spy",
-
-    Callback = function()
-        local Success, Result = pcall(function()
-            local Source = game:HttpGet(
-                "https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"
-            )
-
-            local Script = loadstring(Source)
-
-            if not Script then
-                error("Simple Spy source could not be compiled.")
-            end
-
-            Script()
-        end)
-
-        if not Success then
-            warn("Simple Spy error:", Result)
-
-            Rayfield:Notify({
-                Title = "Simple Spy",
-                Content = "Failed to load Simple Spy.",
-                Duration = 5,
-                Image = "triangle-alert"
-            })
-        end
-    end
-})
 
 Tools:CreateButton({
     Name = "Reset Character",
 
     Callback = function()
+
         local Character = GetCharacter()
-        local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+        local Humanoid = Character
+            and Character:FindFirstChildOfClass("Humanoid")
 
         if Humanoid then
             Humanoid.Health = 0
@@ -570,12 +448,31 @@ Tools:CreateButton({
     Name = "Rejoin Server",
 
     Callback = function()
+
         TeleportService:Teleport(
             game.PlaceId,
             LocalPlayer
         )
     end
 })
+
+Tools:CreateButton({
+    Name = "Open Developer Console",
+
+    Callback = function()
+
+        pcall(function()
+            StarterGui:SetCore(
+                "DevConsoleVisible",
+                true
+            )
+        end)
+    end
+})
+
+--======================================================
+-- DEBUG
+--======================================================
 
 Tools:CreateSection("Debug")
 
@@ -585,19 +482,18 @@ Tools:CreateToggle({
     Flag = "DebugInfo",
 
     Callback = function(Value)
-        print("Debug Info:", Value)
+        print("Ikonned UI Debug:", Value)
     end
 })
 
---//====================================================
---// LOAD
---//====================================================
+--======================================================
+-- LOAD
+--======================================================
 
 Rayfield:LoadConfiguration()
 
 Rayfield:Notify({
     Title = "Ikonned UI",
     Content = "Loaded successfully.",
-    Duration = 5,
-    Image = "sparkles"
+    Duration = 5
 })
