@@ -1,5 +1,5 @@
 --//====================================================
---// IKONNED UI
+--// IKONNED goofy aah UI
 --// Rayfield / Sirius
 --//====================================================
 
@@ -528,6 +528,114 @@ Items:CreateButton({
 
             Rayfield:Notify({
                 Title = "Classical AK 47 Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+})
+
+Items:CreateButton({
+    Name = "Spec Zeta Biograft Energy Sword",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Objects = game:GetObjects("rbxassetid://66416579")
+
+            if not Objects or not Objects[1] then
+                error("Spec Zeta Biograft Energy Sword could not be loaded.")
+            end
+
+            local Item = Objects[1]
+            Item.Parent = game:GetService("Players").LocalPlayer.Backpack
+
+            local RunService = game:GetService("RunService")
+            local Hue = 0
+
+            if _G.ZetaRainbowConnection then
+                _G.ZetaRainbowConnection:Disconnect()
+            end
+
+            _G.ZetaRainbowConnection = RunService.Heartbeat:Connect(function(DeltaTime)
+                if not Item or not Item.Parent then
+                    _G.ZetaRainbowConnection:Disconnect()
+                    _G.ZetaRainbowConnection = nil
+                    return
+                end
+
+                -- Slow rainbow cycle
+                Hue = (Hue + DeltaTime * 0.035) % 1
+                local RainbowColor = Color3.fromHSV(Hue, 1, 1)
+
+                for _, Object in ipairs(Item:GetDescendants()) do
+                    if Object:IsA("BasePart") then
+                        Object.Color = RainbowColor
+
+                    elseif Object:IsA("Trail") then
+                        Object.Color = ColorSequence.new(RainbowColor)
+
+                    elseif Object:IsA("ParticleEmitter") then
+                        Object.Color = ColorSequence.new(RainbowColor)
+                    end
+                end
+            end)
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Spec Zeta Biograft Energy Sword",
+                Content = "Sword loaded with slow rainbow effect.",
+                Duration = 5
+            })
+        else
+            warn("Zeta Sword Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Zeta Sword Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+})
+
+Items:CreateButton({
+    Name = "Magic Carpet",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Object = game:GetObjects("rbxassetid:/225921000/")[1]
+
+            if not Object then
+                error("Magic Carpet asset could not be loaded.")
+            end
+
+            local Source = Object.Source
+
+            if not Source then
+                error("Magic Carpet source could not be found.")
+            end
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Magic Carpet script could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Magic Carpet",
+                Content = "Magic Carpet loaded successfully.",
+                Duration = 5
+            })
+        else
+            warn("Magic Carpet Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Magic Carpet Error",
                 Content = tostring(Result),
                 Duration = 5
             })
