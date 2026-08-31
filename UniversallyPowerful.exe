@@ -60,6 +60,7 @@ local Window = Rayfield:CreateWindow({
 
 local Home = Window:CreateTab("Home", 0)
 local Visuals = Window:CreateTab("Visuals", 0)
+local Exploits = Window:CreateTab("Exploits", 0)
 local Items = Window:CreateTab("Items", 0)
 local Tools = Window:CreateTab("Tools", 0)
 
@@ -374,6 +375,46 @@ Visuals:CreateSlider({
 
         if Camera then
             Camera.FieldOfView = Value
+        end
+    end
+})
+
+--======================================================
+-- EXPLOITS
+--======================================================
+
+Exploits:CreateButton({
+    Name = "Rainbow Trail [ FE ]",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://raw.githubusercontent.com/ikonned/RainbowTrail/refs/heads/main/FE"
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Rainbow Trail [ FE ] could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Rainbow Trail [ FE ]",
+                Content = "Loaded successfully.",
+                Duration = 5
+            })
+        else
+            warn("Rainbow Trail [ FE ] Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Rainbow Trail [ FE ] Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
         end
     end
 })
