@@ -25,7 +25,7 @@ local LocalPlayer = Players.LocalPlayer
 --//====================================================
 
 local Window = Rayfield:CreateWindow({
-    Name = "Ikonned UI",
+    Name = "Ikonned Premium UI",
     Icon = 0,
 
     LoadingTitle = "Ikonned UI",
@@ -383,46 +383,10 @@ Visuals:CreateSlider({
 -- EXPLOITS
 --======================================================
 
-Exploits:CreateSection("Fun Scripts")
+Exploits:CreateSection("Fun Stuff")
 
 Exploits:CreateButton({
-    Name = "Pendulum Hub",
-
-    Callback = function()
-        local Success, Result = pcall(function()
-            local Source = game:HttpGet(
-                "https://raw.githubusercontent.com/ikonned/Nikov4/refs/heads/main/hahayes.lua"
-            )
-
-            local Script = loadstring(Source)
-
-            if not Script then
-                error("Hub could not be compiled.")
-            end
-
-            Script()
-        end)
-
-        if Success then
-            Rayfield:Notify({
-                Title = "Pendulum Hub",
-                Content = "Loaded successfully.",
-                Duration = 5
-            })
-        else
-            warn("Hub Error:", Result)
-
-            Rayfield:Notify({
-                Title = "Hub Error",
-                Content = tostring(Result),
-                Duration = 5
-            })
-        end
-    end
-})
-
-Exploits:CreateButton({
-    Name = "Neko V5",
+    Name = "Neko [WARNING]",
 
     Callback = function()
         local Success, Result = pcall(function()
@@ -458,7 +422,7 @@ Exploits:CreateButton({
 })
 
 Exploits:CreateButton({
-    Name = "Rainbow Trail [ FE ]",
+    Name = "Rainbow Trail",
 
     Callback = function()
         local Success, Result = pcall(function()
