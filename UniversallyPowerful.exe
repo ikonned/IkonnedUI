@@ -1,0 +1,338 @@
+
+-- For your own Roblox experience btw
+
+local Rayfield = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/shlexware/Rayfield/main/source"
+))()
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local Window = Rayfield:CreateWindow({
+    Name = "Ikonned UI",
+    LoadingTitle = "By @Ikonned",
+    LoadingSubtitle = "Universal",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "IkonnedUI",
+        FileName = "Settings"
+    },
+    KeySystem = false
+})
+
+--// HOME
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local Player = Players.LocalPlayer
+
+local Home = Window:CreateTab("Home", "house")
+
+Home:CreateSection("Movement")
+
+local infiniteJump = false
+local noclip = false
+local float = false
+local walkSpeed = 16
+
+local function getCharacter()
+    return Player.Character
+end
+
+local function getHumanoid()
+    local Character = getCharacter()
+    return Character and Character:FindFirstChildOfClass("Humanoid")
+end
+
+--// Speed Slider
+Home:CreateSlider({
+    Name = "Walk Speed",
+    Range = {16, 100},
+    Increment = 1,
+    Suffix = " Speed",
+    CurrentValue = 16,
+    Flag = "WalkSpeed",
+
+    Callback = function(Value)
+        walkSpeed = Value
+
+        local Humanoid = getHumanoid()
+        if Humanoid then
+            Humanoid.WalkSpeed = Value
+        end
+    end
+})
+
+--// Infinite Jump
+Home:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Flag = "InfiniteJump",
+
+    Callback = function(Value)
+        infiniteJump = Value
+    end
+})
+
+UserInputService.JumpRequest:Connect(function()
+    if not infiniteJump then
+        return
+    end
+
+    local Humanoid = getHumanoid()
+
+    if Humanoid then
+        Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+--// Noclip
+Home:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = false,
+    Flag = "Noclip",
+
+    Callback = function(Value)
+        noclip = Value
+    end
+})
+
+RunService.Stepped:Connect(function()
+    if not noclip then
+        return
+    end
+
+    local Character = getCharacter()
+
+    if Character then
+        for _, Part in ipairs(Character:GetDescendants()) do
+            if Part:IsA("BasePart") then
+                Part.CanCollide = false
+            end
+        end
+    end
+end)
+
+--// Float
+Home:CreateToggle({
+    Name = "Float",
+    CurrentValue = false,
+    Flag = "Float",
+
+    Callback = function(Value)
+        float = Value
+    end
+})
+
+RunService.Heartbeat:Connect(function()
+    local Character = getCharacter()
+    local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+
+    if not HumanoidRootPart then
+        return
+    end
+
+    if float then
+        HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(
+            HumanoidRootPart.AssemblyLinearVelocity.X,
+            0,
+            HumanoidRootPart.AssemblyLinearVelocity.Z
+        )
+    end
+end)
+
+--// Reapply speed after respawn
+Player.CharacterAdded:Connect(function(Character)
+    local Humanoid = Character:WaitForChild("Humanoid")
+    Humanoid.WalkSpeed = walkSpeed
+end)
+
+--// VISUALS
+
+local Visuals = Window:CreateTab("Visuals", "eye")
+
+Visuals:CreateSection("Player ESP")
+
+local ESPEnabled = false
+local ESPObjects = {}
+
+local function RemoveESP(Player)
+    if ESPObjects[Player] then
+        ESPObjects[Player]:Destroy()
+        ESPObjects[Player] = nil
+    end
+end
+
+local function AddESP(Player)
+    if Player == LocalPlayer or not ESPEnabled then
+        return
+    end
+
+    local Character = Player.Character
+    local RootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+
+    if not RootPart then
+        return
+    end
+
+    RemoveESP(Player)
+
+    local Box = Instance.new("BoxHandleAdornment")
+    Box.Name = "IkonnedESP"
+    Box.Adornee = RootPart
+    Box.Size = Vector3.new(4, 6, 2)
+    Box.Color3 = Color3.fromRGB(255, 255, 255)
+    Box.Transparency = 0.35
+    Box.AlwaysOnTop = true
+    Box.ZIndex = 5
+    Box.Parent = RootPart
+
+    ESPObjects[Player] = Box
+end
+
+Visuals:CreateToggle({
+    Name = "Player ESP",
+    CurrentValue = false,
+    Flag = "PlayerESP",
+
+    Callback = function(Value)
+        ESPEnabled = Value
+
+        if Value then
+            for _, Player in ipairs(Players:GetPlayers()) do
+                AddESP(Player)
+            end
+        else
+            for Player in pairs(ESPObjects) do
+                RemoveESP(Player)
+            end
+        end
+    end
+})
+
+Players.PlayerAdded:Connect(function(Player)
+    Player.CharacterAdded:Connect(function()
+        task.wait(0.5)
+        AddESP(Player)
+    end)
+end)
+
+for _, Player in ipairs(Players:GetPlayers()) do
+    if Player ~= LocalPlayer then
+        Player.CharacterAdded:Connect(function()
+            task.wait(0.5)
+            AddESP(Player)
+        end)
+    end
+end
+
+Players.PlayerRemoving:Connect(function(Player)
+    RemoveESP(Player)
+end)
+
+Visuals:CreateSection("Camera")
+
+Visuals:CreateSlider({
+    Name = "FOV",
+    Range = {70, 120},
+    Increment = 1,
+    Suffix = "°",
+    CurrentValue = 90,
+    Flag = "FOV",
+    Callback = function(Value)
+        Camera.FieldOfView = Value
+    end
+})
+
+--// GUN
+
+local Gun = Window:CreateTab("Gun", "crosshair")
+
+Gun:CreateSection("Laser Gun")
+
+Gun:CreateButton({
+    Name = "Give Laser Gun",
+    Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ikonned/LaserGun/refs/heads/main/ClientSided"))()
+        print("Hi, this is just a ClientSided Test Laser Gun")
+    end
+})
+
+--// DEVELOPER TOOLS
+
+local Tools = Window:CreateTab("Tools", "wrench")
+
+Tools:CreateSection("Developer Tools")
+
+Tools:CreateButton({
+    Name = "Infinite Yeild",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end
+})
+
+Tools:CreateButton({
+    Name = "Dex Explorer ++",
+    Callback = function()
+         loadstring(game:HttpGet("https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"))() 
+    end
+})
+
+Tools:CreateButton({
+    Name = "Remote Spy",
+    Callback = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Klinac/scripts/main/utopia_spy.lua", true))()
+    end
+})
+
+Tools:CreateButton({
+    Name = "Simple Spy",
+    Callback = function()
+loadstring(game:HttpGet("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"))()
+    end
+})
+
+Tools:CreateButton({
+    Name = "Reset Character",
+    Callback = function()
+        local Character = LocalPlayer.Character
+        local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+        if Humanoid then
+            Humanoid.Health = 0
+        end
+    end
+})
+
+Tools:CreateButton({
+    Name = "Rejoin Server",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(
+            game.PlaceId,
+            LocalPlayer
+        )
+    end
+})
+
+Tools:CreateSection("Debug")
+
+Tools:CreateToggle({
+    Name = "Show Debug Info",
+    CurrentValue = false,
+    Flag = "DebugInfo",
+
+    Callback = function(Value)
+        print("Debug Info:", Value)
+    end
+})
+
+Rayfield:Notify({
+    Title = "Ikonned Universal UI",
+    Content = "Loaded successfully.",
+    Duration = 5
+})
