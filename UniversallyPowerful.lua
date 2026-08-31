@@ -821,6 +821,107 @@ Items:CreateButton({
 Tools:CreateSection("Developer Tools")
 
 Tools:CreateButton({
+    Name = "Infinite Yield",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Infinite Yield could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "Infinite Yield" or "Infinite Yield Error",
+            Content = Success
+                and "Loaded successfully."
+                or tostring(Result),
+            Duration = 5
+        })
+    end
+})
+
+Tools:CreateButton({
+    Name = "Dex Explorer ++",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet("https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua") 
+")
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Dex Explorer ++ could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "Dex Explorer ++" or "Dex Explorer ++ Error",
+            Content = Success
+                and "Loaded successfully."
+                or tostring(Result),
+            Duration = 5
+        })
+    end
+})
+
+Tools:CreateButton({
+    Name = "SimpleSpy",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet("https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua")
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("SimpleSpy could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "SimpleSpy" or "SimpleSpy Error",
+            Content = Success
+                and "Loaded successfully."
+                or tostring(Result),
+            Duration = 5
+        })
+    end
+})
+
+Tools:CreateButton({
+    Name = "RemoteSpy",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet("https://raw.githubusercontent.com/Klinac/scripts/main/utopia_spy.lua")
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("RemoteSpy could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "RemoteSpy" or "RemoteSpy Error",
+            Content = Success
+                and "Loaded successfully."
+                or tostring(Result),
+            Duration = 5
+        })
+    end
+})
+
+Tools:CreateButton({
     Name = "Reset Character",
 
     Callback = function()
