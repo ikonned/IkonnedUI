@@ -109,7 +109,7 @@ end
 
 Home:CreateParagraph({
     Title = Greeting,
-    Content = "Welcome to Ikonned Premium UI, " .. Player.DisplayName
+    Content = "Welcome to Ikonned Premium UI, " .. LocalPlayer.DisplayName
 })
 
 Home:CreateParagraph({
