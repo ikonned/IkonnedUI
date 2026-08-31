@@ -422,6 +422,42 @@ Gun:CreateButton({
     end
 })
 
+Items:CreateButton({
+    Name = "Rainbow Swords",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://raw.githubusercontent.com/gObl00x/Pendulum-Fixed-AND-Others-Scripts/refs/heads/main/Dual%20Ultima%20RB%20Swords"
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Rainbow Swords script could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Rainbow Swords",
+                Content = "Rainbow Swords loaded successfully.",
+                Duration = 5
+            })
+        else
+            warn("Rainbow Swords Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Rainbow Swords Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+}
+
 --======================================================
 -- TOOLS
 --======================================================
