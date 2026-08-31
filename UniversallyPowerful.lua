@@ -96,9 +96,6 @@ end
 -- HOME
 --======================================================
 
-local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
-
 local Hour = tonumber(os.date("%H"))
 local Greeting
 
