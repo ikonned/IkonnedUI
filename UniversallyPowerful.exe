@@ -1,6 +1,5 @@
 --// IKONNED UI
---// Rayfield / Sirius documentation-based version
---// Intended for your own Roblox experience
+--// Rayfield / Sirius documentation-based version test aah version
 
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
@@ -17,7 +16,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local Window = Rayfield:CreateWindow({
     Name = "Ikonned UI",
-    Icon = "sparkles",
+    Icon = 0,
     LoadingTitle = "Ikonned UI",
     LoadingSubtitle = "By @Ikonned",
     ShowText = "Ikonned",
