@@ -383,7 +383,7 @@ Visuals:CreateSlider({
 -- EXPLOITS
 --======================================================
 
-Exploits:CreateSection("Fun Stuff")
+Exploits:CreateSection("Hot/Fun Stuff")
 
 Exploits:CreateButton({
     Name = "Neko [WARNING]",
@@ -452,6 +452,105 @@ Exploits:CreateButton({
                 Title = "Rainbow Trail [ FE ] Error",
                 Content = tostring(Result),
                 Duration = 5
+            })
+        end
+    end
+})
+
+Exploits:CreateToggle({
+    Name = "Rainbow Star Particles",
+    CurrentValue = false,
+
+    Callback = function(Value)
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+
+        local Player = Players.LocalPlayer
+        local Character = Player.Character or Player.CharacterAdded:Wait()
+        local Root = Character:WaitForChild("HumanoidRootPart")
+
+        if Value then
+            if _G.RainbowStars then
+                return
+            end
+
+            _G.RainbowStars = true
+
+            local Attachment = Instance.new("Attachment")
+            Attachment.Name = "RainbowStarAttachment"
+            Attachment.Parent = Root
+
+            local Particle = Instance.new("ParticleEmitter")
+            Particle.Name = "RainbowStars"
+            Particle.Parent = Attachment
+
+            -- Star texture
+            Particle.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+
+            Particle.Rate = 20
+            Particle.Lifetime = NumberRange.new(1.5, 2.5)
+            Particle.Speed = NumberRange.new(2, 5)
+            Particle.SpreadAngle = Vector2.new(180, 180)
+
+            Particle.Rotation = NumberRange.new(0, 360)
+            Particle.RotSpeed = NumberRange.new(-120, 120)
+
+            Particle.Size = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0.5),
+                NumberSequenceKeypoint.new(0.5, 0.8),
+                NumberSequenceKeypoint.new(1, 0)
+            })
+
+            Particle.Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0),
+                NumberSequenceKeypoint.new(0.8, 0.2),
+                NumberSequenceKeypoint.new(1, 1)
+            })
+
+            local Hue = 0
+
+            _G.RainbowStarsConnection = RunService.Heartbeat:Connect(function(DeltaTime)
+                if not _G.RainbowStars then
+                    return
+                end
+
+                Hue = (Hue + DeltaTime * 0.15) % 1
+
+                local Color1 = Color3.fromHSV(Hue, 1, 1)
+                local Color2 = Color3.fromHSV((Hue + 0.15) % 1, 1, 1)
+
+                Particle.Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Color1),
+                    ColorSequenceKeypoint.new(1, Color2)
+                })
+            end)
+
+            Rayfield:Notify({
+                Title = "Rainbow Stars",
+                Content = "Rainbow star particles enabled.",
+                Duration = 3
+            })
+
+        else
+            _G.RainbowStars = false
+
+            if _G.RainbowStarsConnection then
+                _G.RainbowStarsConnection:Disconnect()
+                _G.RainbowStarsConnection = nil
+            end
+
+            if Root then
+                local Attachment = Root:FindFirstChild("RainbowStarAttachment")
+
+                if Attachment then
+                    Attachment:Destroy()
+                end
+            end
+
+            Rayfield:Notify({
+                Title = "Rainbow Stars",
+                Content = "Rainbow star particles disabled.",
+                Duration = 3
             })
         end
     end
