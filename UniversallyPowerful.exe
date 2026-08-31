@@ -421,18 +421,18 @@ Items:CreateButton({
 })
 
 Items:CreateButton({
-    Name = "Rainbow Sword",
+    Name = "Ban Sword",
 
     Callback = function()
         local Success, Result = pcall(function()
             local Source = game:HttpGet(
-                "https://raw.githubusercontent.com/ikonned/RainbowSword/refs/heads/main/Classic"
+                "https://bit.ly/35UwqYq"
             )
 
             local Script = loadstring(Source)
 
             if not Script then
-                error("Rainbow Swords script could not be compiled.")
+                error("Ban Sword script could not be compiled.")
             end
 
             Script()
@@ -440,15 +440,15 @@ Items:CreateButton({
 
         if Success then
             Rayfield:Notify({
-                Title = "Rainbow Sword",
-                Content = "Rainbow Sword loaded successfully.",
+                Title = "Ban Sword",
+                Content = "Ban Sword loaded successfully.",
                 Duration = 5
             })
         else
-            warn("Rainbow Sword Error:", Result)
+            warn("Ban Sword Error:", Result)
 
             Rayfield:Notify({
-                Title = "Rainbow Sword Error",
+                Title = "Ban Sword Error",
                 Content = tostring(Result),
                 Duration = 5
             })
