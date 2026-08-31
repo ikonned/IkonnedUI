@@ -386,18 +386,18 @@ Visuals:CreateSlider({
 Exploits:CreateSection("Fun Scripts")
 
 Exploits:CreateButton({
-    Name = "Neko V4",
+    Name = "Pendulum Hub",
 
     Callback = function()
         local Success, Result = pcall(function()
             local Source = game:HttpGet(
-                "https://raw.githubusercontent.com/ikonned/Nikov4/refs/heads/main/hahayes.lua"
+                "https://raw.githubusercontent.com/Tescalus/Pendulum-Hubs-Source/main/Pendulum%20Hub%20V5.lua"
             )
 
             local Script = loadstring(Source)
 
             if not Script then
-                error("Neko V4 could not be compiled.")
+                error("Hub could not be compiled.")
             end
 
             Script()
@@ -405,15 +405,15 @@ Exploits:CreateButton({
 
         if Success then
             Rayfield:Notify({
-                Title = "Neko V4",
+                Title = "Pendulum Hub",
                 Content = "Loaded successfully.",
                 Duration = 5
             })
         else
-            warn("Neko V4 Error:", Result)
+            warn("Hub Error:", Result)
 
             Rayfield:Notify({
-                Title = "Neko V4 Error",
+                Title = "Hub Error",
                 Content = tostring(Result),
                 Duration = 5
             })
