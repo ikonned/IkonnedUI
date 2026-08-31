@@ -1,6 +1,6 @@
 -- For your own Roblox experience btw
 
-local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Rayfield/main/source"))()
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
