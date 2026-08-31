@@ -536,18 +536,18 @@ Items:CreateButton({
 })
 
 Items:CreateButton({
-    Name = "Ban Sword",
+    Name = "Classical AK 47",
 
     Callback = function()
         local Success, Result = pcall(function()
             local Source = game:HttpGet(
-                "https://bit.ly/35UwqYq"
+                "https://raw.githubusercontent.com/sinret/rbxscript.com-scripts-reuploads-/main/ak47"
             )
 
             local Script = loadstring(Source)
 
             if not Script then
-                error("Ban Sword script could not be compiled.")
+                error("AK 47 script could not be compiled.")
             end
 
             Script()
@@ -555,15 +555,15 @@ Items:CreateButton({
 
         if Success then
             Rayfield:Notify({
-                Title = "Ban Sword",
-                Content = "Ban Sword loaded successfully.",
+                Title = "Classical AK 47",
+                Content = "Classical AK 47 loaded successfully.",
                 Duration = 5
             })
         else
             warn("Ban Sword Error:", Result)
 
             Rayfield:Notify({
-                Title = "Ban Sword Error",
+                Title = "Classical AK 47 Error",
                 Content = tostring(Result),
                 Duration = 5
             })
