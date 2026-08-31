@@ -422,6 +422,40 @@ Exploits:CreateButton({
 })
 
 Exploits:CreateButton({
+    Name = "Emotes",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet("https://gist.githubusercontent.com/lolidkwhy678/6d44b8fa28f70a4269231f11e5749474/raw/0dc4da5a8f49236bac1f3ea01f83226c2ea3dc20/emote%2520script%2520%25F0%259F%2598%2582")
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Emotes script could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Emotes",
+                Content = "Emotes loaded successfully.",
+                Duration = 5
+            })
+        else
+            warn("Emotes Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Emotes Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+})
+
+Exploits:CreateButton({
     Name = "Rainbow Trail",
 
     Callback = function()
@@ -433,7 +467,7 @@ Exploits:CreateButton({
             local Script = loadstring(Source)
 
             if not Script then
-                error("Rainbow Trail [ FE ] could not be compiled.")
+                error("Rainbow Trail could not be compiled.")
             end
 
             Script()
@@ -441,15 +475,15 @@ Exploits:CreateButton({
 
         if Success then
             Rayfield:Notify({
-                Title = "Rainbow Trail [ FE ]",
+                Title = "Rainbow Trail",
                 Content = "Loaded successfully.",
                 Duration = 5
             })
         else
-            warn("Rainbow Trail [ FE ] Error:", Result)
+            warn("Rainbow Trail Error:", Result)
 
             Rayfield:Notify({
-                Title = "Rainbow Trail [ FE ] Error",
+                Title = "Rainbow Trail Error",
                 Content = tostring(Result),
                 Duration = 5
             })
