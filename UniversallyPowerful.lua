@@ -96,6 +96,30 @@ end
 -- HOME
 --======================================================
 
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+local Hour = tonumber(os.date("%H"))
+local Greeting
+
+if Hour >= 5 and Hour < 12 then
+    Greeting = "Good morning"
+elseif Hour >= 12 and Hour < 18 then
+    Greeting = "Good afternoon"
+else
+    Greeting = "Good evening"
+end
+
+Home:CreateParagraph({
+    Title = Greeting,
+    Content = "Welcome to Ikonned Premium UI, " .. Player.DisplayName
+})
+
+Home:CreateParagraph({
+    Title = "Info",
+    Content = "Script Version: 5.4\n\nSome scripts may not run if Executor is bad"
+})
+
 Home:CreateSection("Movement")
 
 local InfiniteJumpEnabled = false
