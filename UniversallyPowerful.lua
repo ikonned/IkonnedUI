@@ -474,7 +474,7 @@ Visuals:CreateSlider({
 Exploits:CreateSection("Hot/Fun Stuff")
 
 Exploits:CreateButton({
-    Name = "NekoV5 [WARNING]",
+    Name = "Neko Ikonned V1",
 
     Callback = function()
         local Success, Result = pcall(function()
@@ -536,6 +536,43 @@ Exploits:CreateButton({
 
             Rayfield:Notify({
                 Title = "Emotes Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+})
+
+Exploits:CreateButton({
+    Name = "Verified",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Source = game:HttpGet(
+                "https://raw.githubusercontent.com/Daniel-IsTheBest/Lua/refs/heads/main/Verified%20Badge.luau",
+                true
+            )
+
+            local Script = loadstring(Source)
+
+            if not Script then
+                error("Verified script could not be compiled.")
+            end
+
+            Script()
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Verified",
+                Content = "Verified loaded successfully.",
+                Duration = 5
+            })
+        else
+            warn("Verified Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Verified Error",
                 Content = tostring(Result),
                 Duration = 5
             })
