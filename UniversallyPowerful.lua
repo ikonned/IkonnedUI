@@ -1008,6 +1008,71 @@ Items:CreateButton({
 })
 
 Items:CreateButton({
+    Name = "Dual-Spec Gamma Biograft Energy Sword",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Objects = game:GetObjects("rbxassetid://335086410")
+
+            if not Objects or not Objects[1] then
+                error("Dual-Spec Gamma Biograft Energy Sword could not be loaded.")
+            end
+
+            local Item = Objects[1]
+            Item.Parent = game:GetService("Players").LocalPlayer.Backpack
+
+            local RunService = game:GetService("RunService")
+            local Hue = 0
+
+            if _G.GammaRainbowConnection then
+                _G.GammaRainbowConnection:Disconnect()
+                _G.GammaRainbowConnection = nil
+            end
+
+            _G.GammaRainbowConnection = RunService.Heartbeat:Connect(function(DeltaTime)
+                if not Item or not Item.Parent then
+                    _G.GammaRainbowConnection:Disconnect()
+                    _G.GammaRainbowConnection = nil
+                    return
+                end
+
+                -- Slow rainbow cycle
+                Hue = (Hue + DeltaTime * 0.035) % 1
+                local RainbowColor = Color3.fromHSV(Hue, 1, 1)
+
+                for _, Object in ipairs(Item:GetDescendants()) do
+                    if Object:IsA("BasePart") then
+                        Object.Color = RainbowColor
+
+                    elseif Object:IsA("Trail") then
+                        Object.Color = ColorSequence.new(RainbowColor)
+
+                    elseif Object:IsA("ParticleEmitter") then
+                        Object.Color = ColorSequence.new(RainbowColor)
+                    end
+                end
+            end)
+        end)
+
+        if Success then
+            Rayfield:Notify({
+                Title = "Gamma Biograft Energy Sword",
+                Content = "Sword loaded with slow rainbow effect.",
+                Duration = 5
+            })
+        else
+            warn("Gamma Sword Error:", Result)
+
+            Rayfield:Notify({
+                Title = "Gamma Sword Error",
+                Content = tostring(Result),
+                Duration = 5
+            })
+        end
+    end
+})
+
+Items:CreateButton({
     Name = "Spec Zeta Biograft Energy Sword",
 
     Callback = function()
