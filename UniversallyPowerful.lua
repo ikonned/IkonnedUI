@@ -474,7 +474,7 @@ Visuals:CreateSlider({
 Exploits:CreateSection("Hot/Fun Stuff")
 
 Exploits:CreateButton({
-    Name = "Neko [WARNING]",
+    Name = "NekoV5 [WARNING]",
 
     Callback = function()
         local Success, Result = pcall(function()
@@ -543,41 +543,184 @@ Exploits:CreateButton({
     end
 })
 
-Exploits:CreateButton({
-    Name = "Rainbow Trail",
+--======================================================
+-- RAINBOW TRAIL
+--======================================================
 
-    Callback = function()
-        local Success, Result = pcall(function()
-            local Source = game:HttpGet(
-                "https://raw.githubusercontent.com/ikonned/RainbowTrail/refs/heads/main/FE"
-            )
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 
-            local Script = loadstring(Source)
+local LocalPlayer = Players.LocalPlayer
 
-            if not Script then
-                error("Rainbow Trail could not be compiled.")
-            end
+local RainbowTrailEnabled = false
+local RainbowConnection = nil
+local TrailObjects = {}
 
-            Script()
-        end)
+local RainbowSpeed = 1
+local TrailWidth = 1
+local TrailTransparency = 0.5
+local TrailLifetime = 2
 
-        if Success then
+
+local function GetRainbowColor(offset)
+    local Hue = (tick() * RainbowSpeed + (offset or 0)) % 1
+    return Color3.fromHSV(Hue, 1, 1)
+end
+
+
+local function CreateRainbowTrail()
+
+    if not LocalPlayer.Character then
+        return
+    end
+
+    local Root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+    if not Root then
+        return
+    end
+
+
+    -- remove old trail
+    for _, Object in pairs(TrailObjects) do
+        if Object then
+            Object:Destroy()
+        end
+    end
+
+    TrailObjects = {}
+
+
+    local Attachment0 = Instance.new("Attachment")
+    Attachment0.Name = "RainbowTrailAttachment0"
+    Attachment0.Position = Vector3.new(-0.5,0,0)
+    Attachment0.Parent = Root
+
+
+    local Attachment1 = Instance.new("Attachment")
+    Attachment1.Name = "RainbowTrailAttachment1"
+    Attachment1.Position = Vector3.new(0.5,0,0)
+    Attachment1.Parent = Root
+
+
+    local Trail = Instance.new("Trail")
+    Trail.Name = "RainbowTrail"
+
+    Trail.Attachment0 = Attachment0
+    Trail.Attachment1 = Attachment1
+
+    Trail.Lifetime = TrailLifetime
+    Trail.WidthScale = NumberSequence.new(TrailWidth)
+
+    Trail.FaceCamera = true
+
+    Trail.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, TrailTransparency),
+        NumberSequenceKeypoint.new(1,1)
+    })
+
+    Trail.Color = ColorSequence.new(
+        GetRainbowColor()
+    )
+
+    Trail.Parent = Root
+
+
+    table.insert(TrailObjects, Attachment0)
+    table.insert(TrailObjects, Attachment1)
+    table.insert(TrailObjects, Trail)
+
+
+    if RainbowConnection then
+        RainbowConnection:Disconnect()
+    end
+
+
+    RainbowConnection = RunService.Heartbeat:Connect(function()
+
+        if not RainbowTrailEnabled then
+            return
+        end
+
+        if Trail and Trail.Parent then
+
+            Trail.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, GetRainbowColor(0)),
+                ColorSequenceKeypoint.new(0.5, GetRainbowColor(0.25)),
+                ColorSequenceKeypoint.new(1, GetRainbowColor(0.5))
+            })
+
+        end
+
+    end)
+end
+
+
+
+local function RemoveRainbowTrail()
+
+    for _, Object in pairs(TrailObjects) do
+        if Object then
+            Object:Destroy()
+        end
+    end
+
+    TrailObjects = {}
+
+
+    if RainbowConnection then
+        RainbowConnection:Disconnect()
+        RainbowConnection = nil
+    end
+end
+
+
+
+-- Rayfield Toggle
+Exploits:CreateToggle({
+    Name = "🌈 Rainbow Trail",
+    CurrentValue = false,
+    Flag = "RainbowTrail",
+
+    Callback = function(Value)
+
+        RainbowTrailEnabled = Value
+
+        if Value then
+
+            CreateRainbowTrail()
+
             Rayfield:Notify({
                 Title = "Rainbow Trail",
-                Content = "Loaded successfully.",
-                Duration = 5
+                Content = "Rainbow trail enabled!",
+                Duration = 3
             })
+
         else
-            warn("Rainbow Trail Error:", Result)
+
+            RemoveRainbowTrail()
 
             Rayfield:Notify({
-                Title = "Rainbow Trail Error",
-                Content = tostring(Result),
-                Duration = 5
+                Title = "Rainbow Trail",
+                Content = "Rainbow trail disabled!",
+                Duration = 3
             })
+
         end
     end
 })
+
+
+-- Respawn support
+LocalPlayer.CharacterAdded:Connect(function()
+
+    task.wait(1)
+
+    if RainbowTrailEnabled then
+        CreateRainbowTrail()
+    end
+
+end)
 
 Exploits:CreateToggle({
     Name = "Rainbow Star Particles",
