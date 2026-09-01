@@ -936,7 +936,7 @@ Items:CreateButton({
 })
 
 Items:CreateButton({
-    Name = "Rainbow MM2 Knife",
+    Name = "MM2 Knife",
 
     Callback = function()
         local Players = game:GetService("Players")
@@ -1076,7 +1076,7 @@ Items:CreateButton({
 
     Callback = function()
         local Success, Result = pcall(function()
-            local Object = game:GetObjects("rbxassetid://225921000")[1]
+            local Object = game:GetObjects("rbxassetid://477910063")[1]
 
             if not Object then
                 error("Magic Carpet asset could not be loaded.")
