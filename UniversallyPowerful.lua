@@ -1071,6 +1071,19 @@ Tools:CreateToggle({
 })
 
 --======================================================
+-- LIVE CAPTION
+--======================================================
+
+local LiveCaption = loadstring(game:HttpGet(
+    "https://pastebin.com/raw/VJs4yXRm"
+))()
+
+LiveCaption.Caption({
+    Text = "Execution Successful",
+    Timer = 9,
+})
+
+--======================================================
 -- LOAD
 --======================================================
 
