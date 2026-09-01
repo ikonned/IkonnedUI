@@ -866,7 +866,7 @@ Items:CreateButton({
 
     Callback = function()
         local Success, Result = pcall(function()
-            local Object = game:GetObjects("rbxassetid:/225921000/")[1]
+            local Object = game:GetObjects("rbxassetid://225921000")[1]
 
             if not Object then
                 error("Magic Carpet asset could not be loaded.")
@@ -942,7 +942,7 @@ Tools:CreateButton({
     Callback = function()
         local Success, Result = pcall(function()
             local Source = game:HttpGet("https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua") 
-")
+                    
             local Script = loadstring(Source)
 
             if not Script then
