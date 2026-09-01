@@ -114,7 +114,7 @@ Home:CreateParagraph({
 
 Home:CreateParagraph({
     Title = "Info",
-    Content = "Script Version: 5.4\n\nSome scripts may not run if Executor is bad"
+    Content = "Script Version: 1.2 Some scripts may not run if Executor is bad"
 })
 
 Home:CreateSection("Movement")
