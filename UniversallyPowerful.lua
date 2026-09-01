@@ -117,12 +117,79 @@ Home:CreateParagraph({
     Content = "Script Version: 1.2 Some scripts may not run if Executor is bad"
 })
 
-Home:CreateSection("Movement")
+Home:CreateSection("Home")
 
 local InfiniteJumpEnabled = false
 local NoclipEnabled = false
 local FloatEnabled = false
 local WalkSpeed = 16
+
+local SelectedPlayer = nil
+
+local function GetPlayerNames()
+    local Names = {}
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(Names, player.Name)
+        end
+    end
+
+    return Names
+end
+
+local function TeleportToPlayer(playerName)
+    local Target = Players:FindFirstChild(playerName)
+
+    if Target 
+    and Target.Character 
+    and Target.Character:FindFirstChild("HumanoidRootPart") 
+    and LocalPlayer.Character 
+    and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        
+        LocalPlayer.Character.HumanoidRootPart.CFrame =
+            Target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+    end
+end
+
+
+local PlayerDropdown = Home:CreateDropdown({
+    Name = "Teleport To Player",
+    Options = GetPlayerNames(),
+    CurrentOption = {""},
+    MultipleOptions = false,
+
+    Flag = "PlayerTeleportDropdown",
+
+    Callback = function(Option)
+        SelectedPlayer = Option[1]
+
+        if SelectedPlayer then
+            TeleportToPlayer(SelectedPlayer)
+        end
+    end,
+})
+
+
+-- Auto update when players join/leave
+Players.PlayerAdded:Connect(function()
+    task.wait(1)
+
+    PlayerDropdown:Refresh(
+        GetPlayerNames(),
+        true
+    )
+end)
+
+
+Players.PlayerRemoving:Connect(function()
+    task.wait(1)
+
+    PlayerDropdown:Refresh(
+        GetPlayerNames(),
+        true
+    )
+end)
 
 -- Walk Speed
 Home:CreateSlider({
