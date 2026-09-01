@@ -58,11 +58,11 @@ local Window = Rayfield:CreateWindow({
 -- CREATE ALL TABS TOGETHER
 --======================================================
 
-local Home = Window:CreateTab("Home", 12928483395)
-local Visuals = Window:CreateTab("Visuals", 14430686259)
-local Exploits = Window:CreateTab("Exploits", 83181718372909)
-local Items = Window:CreateTab("Items", 8478112987)
-local Tools = Window:CreateTab("Tools", 11684563319)
+local Home = Window:CreateTab("Home", 0)
+local Visuals = Window:CreateTab("Visuals", 0)
+local Exploits = Window:CreateTab("Exploits", 0)
+local Items = Window:CreateTab("Items", 0)
+local Tools = Window:CreateTab("Tools", 0)
 
 --======================================================
 -- HELPERS
