@@ -129,67 +129,102 @@ local SelectedPlayer = nil
 local function GetPlayerNames()
     local Names = {}
 
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            table.insert(Names, player.Name)
+    for _, Player in ipairs(Players:GetPlayers()) do
+        if Player ~= LocalPlayer then
+            table.insert(Names, Player.Name)
         end
     end
 
     return Names
 end
 
-local function TeleportToPlayer(playerName)
-    local Target = Players:FindFirstChild(playerName)
+local function TeleportToPlayer(PlayerName)
+    local Target = Players:FindFirstChild(PlayerName)
+    local MyRoot = GetRootPart()
 
-    if Target 
-    and Target.Character 
-    and Target.Character:FindFirstChild("HumanoidRootPart") 
-    and LocalPlayer.Character 
-    and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        
-        LocalPlayer.Character.HumanoidRootPart.CFrame =
-            Target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+    if not Target then
+        return
+    end
+
+    local TargetCharacter = Target.Character
+    local TargetRoot = TargetCharacter
+        and TargetCharacter:FindFirstChild("HumanoidRootPart")
+
+    if TargetRoot and MyRoot then
+        MyRoot.CFrame = TargetRoot.CFrame + Vector3.new(0, 3, 0)
     end
 end
-
 
 local PlayerDropdown = Home:CreateDropdown({
     Name = "Teleport To Player",
     Options = GetPlayerNames(),
     CurrentOption = {""},
     MultipleOptions = false,
-
     Flag = "PlayerTeleportDropdown",
 
     Callback = function(Option)
         SelectedPlayer = Option[1]
 
-        if SelectedPlayer then
+        if SelectedPlayer and SelectedPlayer ~= "" then
             TeleportToPlayer(SelectedPlayer)
         end
     end,
 })
 
-
--- Auto update when players join/leave
 Players.PlayerAdded:Connect(function()
     task.wait(1)
-
-    PlayerDropdown:Refresh(
-        GetPlayerNames(),
-        true
-    )
+    PlayerDropdown:Set(GetPlayerNames())
 end)
-
 
 Players.PlayerRemoving:Connect(function()
     task.wait(1)
-
-    PlayerDropdown:Refresh(
-        GetPlayerNames(),
-        true
-    )
+    PlayerDropdown:Set(GetPlayerNames())
 end)
+
+--======================================================
+-- PLACE TELEPORTER
+--======================================================
+
+local GameIDBox = Home:CreateInput({
+    Name = "Place ID",
+    CurrentValue = "",
+    PlaceholderText = "Enter Roblox Place ID...",
+    RemoveTextAfterFocusLost = false,
+    Flag = "GameTeleportID",
+
+    Callback = function(Text)
+        local PlaceId = tonumber(Text)
+
+        if not PlaceId then
+            Rayfield:Notify({
+                Title = "Invalid Game ID",
+                Content = "Please enter a numeric Roblox Place ID.",
+                Duration = 5
+            })
+            return
+        end
+
+        Rayfield:Notify({
+            Title = "Teleporting",
+            Content = "Teleporting to Place ID: " .. tostring(PlaceId),
+            Duration = 4
+        })
+
+        local Success, ErrorMessage = pcall(function()
+            TeleportService:Teleport(PlaceId, LocalPlayer)
+        end)
+
+        if not Success then
+            warn("Teleport Error:", ErrorMessage)
+
+            Rayfield:Notify({
+                Title = "Teleport Failed",
+                Content = tostring(ErrorMessage),
+                Duration = 7
+            })
+        end
+    end
+})
 
 -- Walk Speed
 Home:CreateSlider({
@@ -1071,11 +1106,6 @@ Exploits:CreateSection("Cool Stuff")
 --======================================================
 -- RAINBOW TRAIL
 --======================================================
-
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-
-local LocalPlayer = Players.LocalPlayer
 
 local RainbowTrailEnabled = false
 local RainbowConnection = nil
