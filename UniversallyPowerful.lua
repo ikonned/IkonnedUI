@@ -482,6 +482,315 @@ Players.PlayerRemoving:Connect(function(Player)
     RemoveESP(Player)
 end)
 
+--======================================================
+-- INVENTORY ESP
+--======================================================
+
+Visuals:CreateSection("Inventory ESP")
+
+local InventoryESPEnabled = false
+local InventoryESPObjects = {}
+local InventoryConnections = {}
+
+local function DisconnectInventoryConnections(Player)
+
+    local Connections = InventoryConnections[Player]
+
+    if not Connections then
+        return
+    end
+
+    for _, Connection in ipairs(Connections) do
+        if Connection then
+            Connection:Disconnect()
+        end
+    end
+
+    InventoryConnections[Player] = nil
+end
+
+local function RemoveInventoryESP(Player)
+
+    DisconnectInventoryConnections(Player)
+
+    local Billboard = InventoryESPObjects[Player]
+
+    if Billboard then
+        Billboard:Destroy()
+        InventoryESPObjects[Player] = nil
+    end
+end
+
+local function GetPlayerTools(Player)
+
+    local Tools = {}
+
+    -- Backpack
+    local Backpack = Player:FindFirstChildOfClass("Backpack")
+
+    if Backpack then
+        for _, Object in ipairs(Backpack:GetChildren()) do
+            if Object:IsA("Tool") then
+                table.insert(Tools, Object.Name)
+            end
+        end
+    end
+
+    -- Equipped tools
+    local Character = Player.Character
+
+    if Character then
+        for _, Object in ipairs(Character:GetChildren()) do
+            if Object:IsA("Tool") then
+
+                if not table.find(Tools, Object.Name) then
+                    table.insert(Tools, Object.Name)
+                end
+
+            end
+        end
+    end
+
+    table.sort(Tools)
+
+    return Tools
+end
+
+local function CreateInventoryESP(Player)
+
+    if Player == LocalPlayer then
+        return
+    end
+
+    if not InventoryESPEnabled then
+        return
+    end
+
+    local Character = Player.Character
+
+    if not Character then
+        return
+    end
+
+    local Head = Character:FindFirstChild("Head")
+
+    if not Head then
+        return
+    end
+
+    RemoveInventoryESP(Player)
+
+    local Billboard = Instance.new("BillboardGui")
+
+    Billboard.Name = "IkonnedInventoryESP"
+    Billboard.Adornee = Head
+    Billboard.Size = UDim2.new(0, 260, 0, 140)
+    Billboard.StudsOffset = Vector3.new(0, 4.5, 0)
+    Billboard.AlwaysOnTop = true
+    Billboard.MaxDistance = 1000
+    Billboard.Parent = Head
+
+    local Label = Instance.new("TextLabel")
+
+    Label.Name = "InventoryLabel"
+    Label.Size = UDim2.new(1, 0, 1, 0)
+    Label.BackgroundTransparency = 1
+
+    Label.TextColor3 = Color3.fromRGB(
+        255,
+        255,
+        255
+    )
+
+    Label.TextStrokeColor3 = Color3.fromRGB(
+        0,
+        0,
+        0
+    )
+
+    Label.TextStrokeTransparency = 0
+    Label.Font = Enum.Font.GothamBold
+    Label.TextSize = 14
+    Label.TextWrapped = true
+    Label.TextYAlignment = Enum.TextYAlignment.Top
+
+    Label.Parent = Billboard
+
+    InventoryESPObjects[Player] = Billboard
+
+    local function UpdateInventory()
+
+        if not Billboard.Parent then
+            return
+        end
+
+        local Tools = GetPlayerTools(Player)
+
+        if #Tools == 0 then
+
+            Label.Text =
+                Player.DisplayName ..
+                "\n" ..
+                "━━━━━━━━━━" ..
+                "\n" ..
+                "No Tools"
+
+            return
+        end
+
+        local Text = Player.DisplayName ..
+            "\n" ..
+            "━━━━━━━━━━"
+
+        for _, ToolName in ipairs(Tools) do
+            Text = Text ..
+                "\n" ..
+                "• " ..
+                ToolName
+        end
+
+        Label.Text = Text
+    end
+
+    UpdateInventory()
+
+    InventoryConnections[Player] = {}
+
+    local Backpack = Player:FindFirstChildOfClass("Backpack")
+
+    if Backpack then
+
+        table.insert(
+            InventoryConnections[Player],
+            Backpack.ChildAdded:Connect(UpdateInventory)
+        )
+
+        table.insert(
+            InventoryConnections[Player],
+            Backpack.ChildRemoved:Connect(UpdateInventory)
+        )
+
+    end
+
+    table.insert(
+        InventoryConnections[Player],
+        Character.ChildAdded:Connect(function(Object)
+
+            if Object:IsA("Tool") then
+                UpdateInventory()
+            end
+
+        end)
+    )
+
+    table.insert(
+        InventoryConnections[Player],
+        Character.ChildRemoved:Connect(function(Object)
+
+            if Object:IsA("Tool") then
+                task.defer(UpdateInventory)
+            end
+
+        end)
+    )
+end
+
+local function UpdateAllInventoryESP()
+
+    for _, Player in ipairs(Players:GetPlayers()) do
+
+        if Player ~= LocalPlayer then
+            CreateInventoryESP(Player)
+        end
+
+    end
+end
+
+local function ClearInventoryESP()
+
+    for Player in pairs(InventoryESPObjects) do
+        RemoveInventoryESP(Player)
+    end
+
+    InventoryESPObjects = {}
+end
+
+Visuals:CreateToggle({
+    Name = "Inventory ESP",
+    CurrentValue = false,
+    Flag = "InventoryESP",
+
+    Callback = function(Value)
+
+        InventoryESPEnabled = Value
+
+        if Value then
+
+            UpdateAllInventoryESP()
+
+            Rayfield:Notify({
+                Title = "Inventory ESP",
+                Content = "Inventory ESP enabled.",
+                Duration = 3
+            })
+
+        else
+
+            ClearInventoryESP()
+
+            Rayfield:Notify({
+                Title = "Inventory ESP",
+                Content = "Inventory ESP disabled.",
+                Duration = 3
+            })
+
+        end
+
+    end
+})
+
+--======================================================
+-- INVENTORY ESP PLAYER EVENTS
+--======================================================
+
+for _, Player in ipairs(Players:GetPlayers()) do
+
+    if Player ~= LocalPlayer then
+
+        Player.CharacterAdded:Connect(function()
+
+            task.wait(1)
+
+            if InventoryESPEnabled then
+                CreateInventoryESP(Player)
+            end
+
+        end)
+
+    end
+
+end
+
+Players.PlayerAdded:Connect(function(Player)
+
+    Player.CharacterAdded:Connect(function()
+
+        task.wait(1)
+
+        if InventoryESPEnabled then
+            CreateInventoryESP(Player)
+        end
+
+    end)
+
+end)
+
+Players.PlayerRemoving:Connect(function(Player)
+
+    RemoveInventoryESP(Player)
+
+end)
+
 -- Camera
 Visuals:CreateSection("Camera")
 
