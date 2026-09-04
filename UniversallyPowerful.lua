@@ -823,7 +823,7 @@ Exploits:CreateButton({
     Callback = function()
         local Success, Result = pcall(function()
             local Source = game:HttpGet(
-                "https://raw.githubusercontent.com/ikonned/NikoV5/refs/heads/main/haha.lua"
+                "https://raw.githubusercontent.com/ikonned/NikoV5/refs/heads/main/fun.luau"
             )
 
             local Script = loadstring(Source)
