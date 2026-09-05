@@ -124,6 +124,10 @@ local NoclipEnabled = false
 local FloatEnabled = false
 local WalkSpeed = 16
 
+--======================================================
+-- TELEPORT TO PLAYER
+--======================================================
+
 local SelectedPlayer = nil
 
 local function GetPlayerNames()
@@ -139,10 +143,11 @@ local function GetPlayerNames()
 end
 
 local function TeleportToPlayer(PlayerName)
+
     local Target = Players:FindFirstChild(PlayerName)
     local MyRoot = GetRootPart()
 
-    if not Target then
+    if not Target or not MyRoot then
         return
     end
 
@@ -150,35 +155,69 @@ local function TeleportToPlayer(PlayerName)
     local TargetRoot = TargetCharacter
         and TargetCharacter:FindFirstChild("HumanoidRootPart")
 
-    if TargetRoot and MyRoot then
+    if TargetRoot then
         MyRoot.CFrame = TargetRoot.CFrame + Vector3.new(0, 3, 0)
     end
 end
 
+
+-- DROPDOWN ONLY SELECTS
+-- IT DOES NOT TELEPORT ANYMORE
+
 local PlayerDropdown = Home:CreateDropdown({
-    Name = "Teleport To Player",
+    Name = "Select Player",
     Options = GetPlayerNames(),
     CurrentOption = {""},
     MultipleOptions = false,
-    Flag = "PlayerTeleportDropdown",
+    Flag = "PlayerSelection",
 
     Callback = function(Option)
+
         SelectedPlayer = Option[1]
 
-        if SelectedPlayer and SelectedPlayer ~= "" then
-            TeleportToPlayer(SelectedPlayer)
-        end
     end,
 })
 
+
+-- SEPARATE BUTTON DOES THE TELEPORT
+
+Home:CreateButton({
+    Name = "Teleport To Selected Player",
+
+    Callback = function()
+
+        if not SelectedPlayer or SelectedPlayer == "" then
+            Rayfield:Notify({
+                Title = "Teleport",
+                Content = "Select a player first.",
+                Duration = 3
+            })
+            return
+        end
+
+        TeleportToPlayer(SelectedPlayer)
+
+    end
+})
+
+
+-- UPDATE PLAYER LIST
+
 Players.PlayerAdded:Connect(function()
+
     task.wait(1)
+
     PlayerDropdown:Set(GetPlayerNames())
+
 end)
 
+
 Players.PlayerRemoving:Connect(function()
+
     task.wait(1)
+
     PlayerDropdown:Set(GetPlayerNames())
+
 end)
 
 --======================================================
